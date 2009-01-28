@@ -1,9 +1,45 @@
-#!/bin/sh
+#!/bin/bash
+## Packages needed to run this script
 COMMON_PACKAGES="build-essential bin86 kernel-package wget curl"
 CONSOLE_PACKAGES="libncurses5 libncurses5-dev"
 X_PACKAGES="libqt3-headers libqt3-mt-dev"
 
-apt-get install $COMMON_PACKAGES $CONSOLE_PACKAGES
+## Print usage options
+
+USAGE="Usage: $0 [ --console | --xconsole ]"
+
+if [ $# -eq 0 ]; then
+  echo "$USAGE"
+  exit 1
+fi
+
+## Parse options
+
+while (( "$#" )); do
+  case "$1" in
+    --console)
+      ADDITIONAL_PACKAGES="$CONSOLE_PACKAGES"
+      CONFIG_OPTION="CONSOLE"
+      ;;
+    --xconsole)
+      ADDITIONAL_PACKAGES="$X_PACKAGES"
+      CONFIG_OPTION="X"
+      ;;
+    *)
+      echo "$USAGE"
+      exit 1
+      ;;
+  esac
+shift
+done
+
+
+
+echo "$ADDITIONAL_PACKAGES"
+echo "$CONFIG_OPTION"
+exit
+
+apt-get install $COMMON_PACKAGES $ADDITIONAL_PACKAGES
 
 cd /usr/src
 
