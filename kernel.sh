@@ -6,7 +6,7 @@ X_PACKAGES="libqt3-headers libqt3-mt-dev"
 
 ## Print usage options
 
-USAGE="Usage: $0 [ --console | --xconsole ]"
+USAGE="Usage: $0 [ --console | --xconsole ] [--download] [--extract]"
 
 if [ $# -eq 0 ]; then
   echo "$USAGE"
@@ -25,6 +25,12 @@ while (( "$#" )); do
       ADDITIONAL_PACKAGES="$X_PACKAGES"
       CONFIG_OPTION="X"
       ;;
+    --download)
+      DOWNLOAD_KERNEL="TRUE"
+      ;;
+    --extract)
+      EXTRACT_KERNEL="TRUE"
+      ;;
     *)
       echo "$USAGE"
       exit 1
@@ -33,23 +39,35 @@ while (( "$#" )); do
 shift
 done
 
-
-
-echo "$ADDITIONAL_PACKAGES"
-echo "$CONFIG_OPTION"
-exit
-
 apt-get install $COMMON_PACKAGES $ADDITIONAL_PACKAGES
 
 cd /usr/src
 
-DOWNLOAD_PATH=`curl kernel.org | grep "/pub/linux/kernel/" | grep ">F<" | cut -d'"' -f2 | head -n 1`
+DOWNLOAD_PATH=`curl -s kernel.org | grep "/pub/linux/kernel/" | grep ">F<" | cut -d'"' -f2 | head -n 1`
 KERNEL_FILENAME=`echo $DOWNLOAD_PATH | tr "/" "\n" | tail -n 1`
 KERNEL_FIELDCNT=`echo $KERNEL_FILENAME | tr "." "\n" | head -n -2 | wc -l`
 KERNEL_DIR=`echo $KERNEL_FILENAME | tr "." "\n" | head -n -2 |  tr "\n" "." | cut -d"." --field=-$KERNEL_FIELDCNT`
 
-wget -c http://kernel.org$DOWNLOAD_PATH
-tar -xvjf $KERNEL_FILENAME
+echo "==================="
+if [ ! -f "$KERNEL_FILENAME" -o -n "$DOWNLOAD_KERNEL" ]; then
+  if [ -f "$KERNEL_FILENAME" ]; then
+    rm "$KERNEL_FILENAME"
+  fi
+  wget -c http://kernel.org$DOWNLOAD_PATH
+else
+  echo "$KERNEL_FILENAME already exists"
+fi
+echo "==================="
+if [ ! -d "$KERNEL_DIR" -o -n "$EXTRACT_KERNEL" ]; then
+  if [ -d "$KERNEL_DIR" ]; then
+    rm -rf "$KERNEL_DIR"
+  fi
+  tar -xvjf $KERNEL_FILENAME
+else
+  echo "$KERNEL_DIR already exists"
+fi
+exit 1
+
 echo
 echo $KERNEL_DIR
 cd $KERNEL_DIR
