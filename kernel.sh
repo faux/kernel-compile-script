@@ -1,5 +1,5 @@
 #!/bin/sh
-COMMON_PACKAGES="build-essential bin86 kernel-package wget"
+COMMON_PACKAGES="build-essential bin86 kernel-package wget curl"
 CONSOLE_PACKAGES="libncurses5 libncurses5-dev"
 X_PACKAGES="libqt3-headers libqt3-mt-dev"
 apt-get install $COMMON_PACKAGES $CONSOLE_PACKAGES
