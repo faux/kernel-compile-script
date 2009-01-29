@@ -6,7 +6,7 @@ X_PACKAGES="libqt3-headers libqt3-mt-dev"
 
 ## Print usage options
 
-USAGE="Usage: $0 [ --console | --xconsole ] [--download] [--extract]"
+USAGE="Usage: $0 [ --console | --xconsole ] [--download] [--extract] [--newconfig] [--useconfig=PATH]"
 
 if [ $# -eq 0 ]; then
   echo "$USAGE"
@@ -30,6 +30,12 @@ while (( "$#" )); do
       ;;
     --extract)
       EXTRACT_KERNEL="TRUE"
+      ;;
+    --newconfig)
+      NEW_CONFIG="TRUE"
+      ;;
+    --useconfig=*)
+      USE_CONFIG=$(echo "$1" | sed 's/^--useconfig=//')
       ;;
     *)
       echo "$USAGE"
@@ -66,14 +72,18 @@ if [ ! -d "$KERNEL_DIR" -o -n "$EXTRACT_KERNEL" ]; then
 else
   echo "$KERNEL_DIR already exists"
 fi
-exit 1
+
 
 echo
 echo $KERNEL_DIR
 cd $KERNEL_DIR
 
-cp /boot/config-$(uname -r) .config
-
+if [ -z "$NEW_CONFIG" -a -z "$USE_CONFIG" ]; then
+  cp /boot/config-$(uname -r) .config
+elif [ -n "$USE_CONFIG" ]; then
+  cp "$USE_CONFIG" .config
+fi
+exit 1
 yes "" | make oldconfig
 
 make xconfig
