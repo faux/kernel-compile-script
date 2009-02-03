@@ -49,10 +49,10 @@ apt-get install $COMMON_PACKAGES $ADDITIONAL_PACKAGES
 
 cd /usr/src
 
-DOWNLOAD_PATH=`curl -s kernel.org | grep "/pub/linux/kernel/" | grep ">F<" | cut -d'"' -f2 | head -n 1`
-KERNEL_FILENAME=`echo $DOWNLOAD_PATH | tr "/" "\n" | tail -n 1`
-KERNEL_FIELDCNT=`echo $KERNEL_FILENAME | tr "." "\n" | head -n -2 | wc -l`
-KERNEL_DIR=`echo $KERNEL_FILENAME | tr "." "\n" | head -n -2 |  tr "\n" "." | cut -d"." --field=-$KERNEL_FIELDCNT`
+DOWNLOAD_PATH=$(curl -s kernel.org | grep "/pub/linux/kernel/" | grep ">F<" | cut -d'"' -f2 | head -n 1)
+KERNEL_FILENAME=$(echo $DOWNLOAD_PATH | tr "/" "\n" | tail -n 1)
+KERNEL_FIELDCNT=$(echo $KERNEL_FILENAME | tr "." "\n" | head -n -2 | wc -l)
+KERNEL_DIR=$(echo $KERNEL_FILENAME | tr "." "\n" | head -n -2 |  tr "\n" "." | cut -d"." --field=-$KERNEL_FIELDCNT)
 
 echo "==================="
 if [ ! -f "$KERNEL_FILENAME" -o -n "$DOWNLOAD_KERNEL" ]; then
