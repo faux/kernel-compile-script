@@ -83,12 +83,21 @@ if [ -z "$NEW_CONFIG" -a -z "$USE_CONFIG" ]; then
 elif [ -n "$USE_CONFIG" ]; then
   cp "$USE_CONFIG" .config
 fi
-exit 1
+
 yes "" | make oldconfig
 
-make xconfig
-#make menuconfig
-
+case "$CONFIG_OPTION" in
+  X)
+    make xconfig
+    ;;
+  CONSOLE)
+    make menuconfig
+    ;;
+  *)
+    exit 1
+    ;;
+esac
+exit 1
 make-kpkg clean
 
 CONCURRENCY_LEVEL=3 time make-kpkg --initrd --revision=64 kernel_image kernel_headers modules_image
